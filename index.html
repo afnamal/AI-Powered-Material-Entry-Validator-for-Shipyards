@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malzeme Bilgileri</title>
+  <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .suggestions {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+    }
+    .suggestion-item {
+      padding: 10px;
+      cursor: pointer;
+    }
+    .suggestion-item:hover {
+      background-color: #f0f0f0;
+    }
+    .selected-material {
+      border: 2px solid #007bff;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container mt-5">
+    <div class="text-center mb-4">
+      <img src="https://erp.tersan.com.tr/img/logo/logo-shipyard-400.png" alt="Logo" class="img-fluid" style="max-width: 200px;">
+    </div>
+    <div class="card">
+      <div class="card-header text-center">
+        <h1>Malzeme Bilgileri</h1>
+      </div>
+      <div class="card-body">
+        <form @submit.prevent="analyzeMaterial">
+          <div class="form-group">
+            <label for="category">Kategori *</label>
+            <select id="category" v-model="form.category" class="form-control" @change="updateSuggestions">
+              <option value="">Seçin</option>
+              <option value="BORU">BORU</option>
+              <option value="PROFIL">PROFIL</option>
+              <option value="SAC">SAC</option>
+            </select>
+          </div>
+
+          <div v-if="form.category === 'BORU'">
+            <div class="form-group">
+              <label for="type">Boru Türü</label>
+              <select id="type" v-model="form.type" class="form-control" @change="updateSuggestions">
+                <option value="">Seçin</option>
+                <option value="ALÜMİNİZE FLEX">ALÜMİNİZE FLEX</option>
+                <option value="DİKİŞLİ">DİKİŞLİ</option>
+                <option value="DİKİŞSİZ">DİKİŞSİZ</option>
+                <option value="ESNEK">ESNEK</option>
+                <option value="AYAK DELİKLİ">AYAK DELİKLİ</option>
+                <option value="AYAK DELİKSİZ">AYAK DELİKSİZ</option>
+                <option value="KANGAL">KANGAL</option>
+                <option value="MULTICORE">MULTICORE</option>
+                <option value="SPİRAL KAYNAKLI">SPİRAL KAYNAKLI</option>
+                <option value="DİKİŞLİ DİŞLİ">DİKİŞLİ DİŞLİ</option>
+                <option value="DİREK">DİREK</option>
+                <option value="GEBERİT MAPRESS">GEBERİT MAPRESS</option>
+                <option value="GEBERİT MEPLA">GEBERİT MEPLA</option>
+                <option value="HAVALANDIRMA">HAVALANDIRMA</option>
+                <option value="HİDROLİK">HİDROLİK</option>
+                <option value="HİDROLİK MULTICORE">HİDROLİK MULTICORE</option>
+                <option value="İSKANDİL TAPASI">İSKANDİL TAPASI</option>
+                <option value="İZOLASYON">İZOLASYON</option>
+                <option value="İZOLELİ">İZOLELİ</option>
+                <option value="İZOLESİZ">İZOLESİZ</option>
+                <option value="İZOLELİ SPİRAL">İZOLELİ SPİRAL</option>
+                <option value="PİMAŞ">PİMAŞ</option>
+                <option value="PİMTAŞ">PİMTAŞ</option>
+                <option value="ORTAÇ SPİRAL">ORTAÇ SPİRAL</option>
+                <option value="SPİRAL DİKİŞLİ">SPİRAL DİKİŞLİ</option>
+                <option value="SU">SU</option>
+                <option value="THT">THT</option>
+                <option value="TİE">TİE</option>
+                <option value="TORNA">TORNA</option>
+                <option value="TRİPLEX">TRİPLEX</option>
+                <option value="ZİNCİR AKIŞ">ZİNCİR AKIŞ</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="material">Malzeme</label>
+              <select id="material" v-model="form.material" class="form-control" @change="updateSuggestions">
+                <option value="">Seçin</option>
+                <option value="ALÜMİNYUM">ALÜMİNYUM</option>
+                <option value="GALVANİZ">GALVANİZ</option>
+                <option value="BAFON">BAFON</option>
+                <option value="BAKIR">BAKIR</option>
+                <option value="PLASTİK">PLASTİK</option>
+                <option value="BRONZ">BRONZ</option>
+                <option value="C-PVC">C-PVC</option>
+                <option value="CAM">CAM</option>
+                <option value="ÇELİK">ÇELİK</option>
+                <option value="ÇEKME ÇELİK">ÇEKME ÇELİK</option>
+                <option value="SÜPER DUPLEX PASLANMAZ ÇELİK">SÜPER DUPLEX PASLANMAZ ÇELİK</option>
+                <option value="PASLANMAZ ÇELİK">PASLANMAZ ÇELİK</option>
+                <option value="GALVANİZ ÇELİK">GALVANİZ ÇELİK</option>
+                <option value="ELEKTRO GALVANİZ ÇELİK">ELEKTRO GALVANİZ ÇELİK</option>
+                <option value="CUNİFE">CUNİFE</option>
+                <option value="DUPLEX PASLANMAZ ÇELİK">DUPLEX PASLANMAZ ÇELİK</option>
+                <option value="KARBON ÇELİK">KARBON ÇELİK</option>
+                <option value="POLİETİLEN (PE)">POLİETİLEN (PE)</option>
+                <option value="PASLANMAZ ÇELİK">PASLANMAZ ÇELİK</option>
+                <option value="GALVANİZ">GALVANİZ</option>
+                <option value="METAL PVC">METAL PVC</option>
+                <option value="POLİPROPİLEN">POLİPROPİLEN</option>
+                <option value="POLYAMİD">POLYAMİD</option>
+                <option value="PVC">PVC</option>
+                <option value="PPRC">PPRC</option>
+                <option value="KAYNAKLI ÇELİK">KAYNAKLI ÇELİK</option>
+                <option value="PASLANMAZ">PASLANMAZ</option>
+                <option value="FRP">FRP</option>
+                <option value="DÖKME DEMİR">DÖKME DEMİR</option>
+                <option value="BETON">BETON</option>
+                <option value="NİKEL ALAŞIMI">NİKEL ALAŞIMI</option>
+                <option value="POLİBUTİLEN (PB)">POLİBUTİLEN (PB)</option>
+                <option value="PVDF">PVDF</option>
+                <option value="KURŞUN">KURŞUN</option>
+                <option value="FİBERGLAS">FİBERGLAS</option>
+                <option value="ABS">ABS</option>
+                <option value="PEX">PEX</option>
+                <option value="SERAMİK">SERAMİK</option>
+                <option value="NAYLON">NAYLON</option>
+                <option value="POLİASETAL">POLİASETAL</option>
+                <option value="TPE">TPE</option>
+                <option value="PFA">PFA</option>
+                <option value="PVF">PVF</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="standard">Standart</label>
+              <input type="text" id="standard" v-model="form.standard" class="form-control" placeholder="Örneğin: ANSI B36.10" @input="updateSuggestions">
+            </div>
+
+            <div class="form-group">
+              <label for="nominalDiameter">Nominal Çap (DN)</label>
+              <input type="text" id="nominalDiameter" v-model="form.nominalDiameter" class="form-control" placeholder="Örneğin: DN40" @input="updateSuggestions" @blur="checkMM(form.nominalDiameter, 'Nominal Çap')">
+            </div>
+
+            <div class="form-group">
+              <label for="inchSize">İnç Boyutu</label>
+              <input type="text" id="inchSize" v-model="form.inchSize" class="form-control" placeholder="Örneğin: 1.1/2" @input="updateSuggestions">
+            </div>
+
+            <div class="form-group">
+              <label for="schedule">Schedule (Et Kalınlığı)</label>
+              <input type="text" id="schedule" v-model="form.schedule" class="form-control" placeholder="Örneğin: SCH80" @input="updateSuggestions">
+            </div>
+
+            <div class="form-group">
+              <label for="outerDiameter">Dış Çap (OD)</label>
+              <input type="text" id="outerDiameter" v-model="form.outerDiameter" class="form-control" placeholder="Örneğin: 48,3 mm" @input="updateSuggestions" @blur="checkMM(form.outerDiameter, 'Dış Çap')">
+            </div>
+
+            <div class="form-group">
+              <label for="wallThickness">Et Kalınlığı</label>
+              <input type="text" id="wallThickness" v-model="form.wallThickness" class="form-control" placeholder="Örneğin: 5,08 mm" @input="updateSuggestions" @blur="checkMM(form.wallThickness, 'Et Kalınlığı')">
+            </div>
+
+            <div class="form-group">
+              <label for="materialQuality">Malzeme Kalitesi</label>
+              <input type="text" id="materialQuality" v-model="form.materialQuality" class="form-control" placeholder="Örneğin: ST37" @input="updateSuggestions">
+            </div>
+
+            <div class="form-group">
+              <label for="additionalInfo">Diğer Bilgiler</label>
+              <input type="text" id="additionalInfo" v-model="form.additionalInfo" class="form-control" placeholder="Örneğin: *2.2" @input="updateSuggestions">
+            </div>
+          </div>
+
+          <div v-if="form.category === 'PROFIL'">
+            <div class="form-group">
+              <label for="type">Profil Türü</label>
+              <select id="type" v-model="form.type" class="form-control" @change="updateSuggestions">
+                <option value="">Seçin</option>
+                <option value="HİDROLİK BORU TAŞIYICI">HİDROLİK BORU TAŞIYICI</option>
+                <option value="ÇUBUK">ÇUBUK</option>
+                <option value="AYAK DELİKLİ">AYAK DELİKLİ</option>
+                <option value="ALTIKÖŞE">ALTIKÖŞE</option>
+                <option value="YÜZEY KAPLAMA">YÜZEY KAPLAMA</option>
+                <option value="BURÇ">BURÇ</option>
+                <option value="DOLU YUVARLAK">DOLU YUVARLAK</option>
+                <option value="YUVARLAK">YUVARLAK</option>
+                <option value="ÇALIŞMA TEZGÂHI">ÇALIŞMA TEZGÂHI</option>
+                <option value="HEA">HEA</option>
+                <option value="HEB">HEB</option>
+                <option value="IPE">IPE</option>
+                <option value="KÖŞEBENT">KÖŞEBENT</option>
+                <option value="KUTU">KUTU</option>
+                <option value="DOLU YUVARLAK">DOLU YUVARLAK</option>
+                <option value="DOLU KARE">DOLU KARE</option>
+                <option value="KARE">KARE</option>
+                <option value="HOLLANDA">HOLLANDA</option>
+                <option value="KALIP">KALIP</option>
+                <option value="KAMA KARE">KAMA KARE</option>
+                <option value="KENET">KENET</option>
+                <option value="NER ÇUBUK">NER ÇUBUK</option>
+                <option value="NPI">NPI</option>
+                <option value="NPU">NPU</option>
+                <option value="PANEL">PANEL</option>
+                <option value="PANJUR">PANJUR</option>
+                <option value="NVA">NVA</option>
+                <option value="SİGMA">SİGMA</option>
+                <option value="ŞAFT MİLİ">ŞAFT MİLİ</option>
+                <option value="T">T</option>
+                <option value="TE">TE</option>
+                <option value="U">U</option>
+                <option value="UPE">UPE</option>
+                <option value="UPN">UPN</option>
+                <option value="YAPI">YAPI</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="material">Malzeme</label>
+              <select id="material" v-model="form.material" class="form-control" @change="updateSuggestions">
+                <option value="">Seçin</option>
+                <option value="PASLANMAZ ÇELİK">PASLANMAZ ÇELİK</option>
+                <option value="BAKIR">BAKIR</option>
+                <option value="PİRİNÇ">PİRİNÇ</option>
+                <option value="ALÜMİNYUM">ALÜMİNYUM</option>
+                <option value="ALÜMİNYUM BRONZ">ALÜMİNYUM BRONZ</option>
+                <option value="ALÜMİNYUM ELOKSAL">ALÜMİNYUM ELOKSAL</option>
+                <option value="BRONZ">BRONZ</option>
+                <option value="PASLANMAZ">PASLANMAZ</option>
+                <option value="KALAY BRONZ">KALAY BRONZ</option>
+                <option value="ÇELİK">ÇELİK</option>
+                <option value="GALVANİZ ÇELİK">GALVANİZ ÇELİK</option>
+                <option value="BAFON">BAFON</option>
+                <option value="C-PVC">C-PVC</option>
+                <option value="CAM">CAM</option>
+                <option value="GALVANİZ">GALVANİZ</option>
+                <option value="TİTANYUM">TİTANYUM</option>
+                <option value="PVC">PVC</option>
+                <option value="AHŞAP">AHŞAP</option>
+                <option value="DÖKME DEMİR">DÖKME DEMİR</option>
+                <option value="MAGNEZYUM">MAGNEZYUM</option>
+                <option value="PLASTİK">PLASTİK</option>
+                <option value="FİBERMETAL">FİBERMETAL</option>
+                <option value="KARBON FİBER">KARBON FİBER</option>
+                <option value="ZAMAK">ZAMAK</option>
+                <option value="GRAFİT">GRAFİT</option>
+                <option value="KURŞUN">KURŞUN</option>
+                <option value="SİLİSYUM KARBÜR">SİLİSYUM KARBÜR</option>
+                <option value="LAMİNAT">LAMİNAT</option>
+                <option value="KEVLAR">KEVLAR</option>
+                <option value="BAKIR NİKEL ALAŞIM">BAKIR NİKEL ALAŞIM</option>
+                <option value="TİTANYUM ALAŞIM">TİTANYUM ALAŞIM</option>
+                <option value="NAYLON">NAYLON</option>
+                <option value="ABS">ABS</option>
+                <option value="EPP">EPP</option>
+                <option value="PASLANMAZ DEMİR">PASLANMAZ DEMİR</option>
+                <option value="POLYAMİD">POLYAMİD</option>
+                <option value="İMALAT ÇELİĞİ">İMALAT ÇELİĞİ</option>
+                <option value="KESTAMİD">KESTAMİD</option>
+                <option value="KROM">KROM</option>
+                <option value="KARBON ÇELİK">KARBON ÇELİK</option>
+                <option value="TRANSMİSYON ÇELİK">TRANSMİSYON ÇELİK</option>
+                <option value="ELEKTRO GALVANİZ">ELEKTRO GALVANİZ</option>
+                <option value="LASTİK SÜNGER">LASTİK SÜNGER</option>
+                <option value="LASTİK LUMBUZ">LASTİK LUMBUZ</option>
+                <option value="TEFLON">TEFLON</option>
+                <option value="POLİETİLEN">POLİETİLEN</option>
+                <option value="LAMA DEMİR">LAMA DEMİR</option>
+                <option value="SİLME DEMİR">SİLME DEMİR</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="alloy">Alaşım</label>
+              <input type="text" id="alloy" v-model="form.alloy" class="form-control" placeholder="Örneğin: 6063 T6" @input="updateSuggestions">
+            </div>
+
+            <div class="form-group">
+              <label for="dimensions">Boyutlar</label>
+              <input type="text" id="dimensions" v-model="form.dimensions" class="form-control" placeholder="Örneğin: 5 x 90 x 200 mm" @input="updateSuggestions" @blur="checkMM(form.dimensions, 'Boyutlar')">
+            </div>
+
+            <div class="form-group">
+              <label for="additionalInfo">Ek Bilgiler</label>
+              <input type="text" id="additionalInfo" v-model="form.additionalInfo" class="form-control" placeholder="Örneğin: PEN BOARDS" @input="updateSuggestions">
+            </div>
+          </div>
+
+          <div v-if="form.category === 'SAC'">
+            <div class="form-group">
+              <label for="sheetType">Sac Türü</label>
+              <select id="type" v-model="form.type" class="form-control" @change="updateSuggestions">
+                <option value="">Seçin</option>
+                <option value="HARDOX">HARDOX</option>
+                <option value="S690QL">S690QL</option>
+                <option value="DUPLEX">DUPLEX</option>
+                <option value="TRAPEZ">TRAPEZ</option>
+                <option value="LEVHA">LEVHA</option>
+                <option value="GENİŞLETİLMİŞ">GENİŞLETİLMİŞ</option>
+                <option value="PANJURLU">PANJURLU</option>
+                <option value="FORM">FORM</option>
+                <option value="DELİKLİ">DELİKLİ</option>
+                <option value="ŞEFFAF">ŞEFFAF</option>
+                <option value="DİLLİMAX">DİLLİMAX</option>
+                <option value="BOYALI">BOYALI</option>
+                <option value="KAPMA">KAPMA</option>
+                <option value="RULO">RULO</option>
+                <option value="PLAKA">PLAKA</option>
+                <option value="KESME">KESME</option>
+                <option value="OLUKLU">OLUKLU</option>
+                <option value="YASTIK">YASTIK</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="material">Malzeme</label>
+              <
+              <select id="material" v-model="form.material" class="form-control" @change="updateSuggestions">
+                <option value="">Seçin</option>
+                <option value="ÇELİK">ÇELİK</option>
+                <option value="PASLANMAZ">PASLANMAZ</option>
+                <option value="ALUMİNYUM">ALUMİNYUM</option>
+                <option value="GALVANİZ">GALVANİZ</option>
+                <option value="HARDOX">HARDOX</option>
+                <option value="WELDOX">WELDOX</option>
+                <option value="STRENX">STRENX</option>
+                <option value="S690QL">S690QL</option>
+                <option value="NAXTRA">NAXTRA</option>
+                <option value="S355J2+N">S355J2+N</option>
+                <option value="DKP">DKP</option>
+                <option value="S690Q">S690Q</option>
+                <option value="S690QL1">S690QL1</option>
+                <option value="GRAFİTLİ">GRAFİTLİ</option>
+                <option value="CORTEN">CORTEN</option>
+                <option value="POLİETİLEN">POLİETİLEN</option>
+                <option value="TEFLON">TEFLON</option>
+                <option value="KROM">KROM</option>
+                <option value="ÇİNKO">ÇİNKO</option>
+                <option value="316L">316L</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="alloy">Alaşım</label>
+              <input type="text" id="alloy" v-model="form.alloy" class="form-control" placeholder="Örneğin: HARDOX S690QL" @input="updateSuggestions">
+            </div>
+            <div class="form-group">
+              <label for="dimensions">Boyutlar</label>
+              <input type="text" id="dimensions" v-model="form.dimensions" class="form-control" placeholder="Örneğin: 15 x 2400 x 2000 mm" @input="updateSuggestions" @blur="checkMM(form.dimensions, 'Boyutlar')">
+            </div>
+            <div class="form-group">
+              <label for="additionalInfo">Ek Bilgiler</label>
+              <input type="text" id="additionalInfo" v-model="form.additionalInfo" class="form-control" placeholder="Örneğin: SAC EK BİLGİSİ" @input="updateSuggestions">
+            </div>
+          </div>
+
+          <div class="selected-material" v-if="selectedMaterialName">
+            {{ selectedMaterialName }}
+          </div>
+          <div v-if="tamMalzemeIsmi && !selectedMaterialName" class="selected-material">
+            {{ tamMalzemeIsmi }}
+          </div>
+
+          <div v-if="aiResponse" class="alert alert-info mt-3">
+            Yapay Zeka Cevabı: {{ aiResponse }}
+          </div>
+
+          <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-success mt-3" @click="analyzeMaterial">Analiz Et</button>
+          </div>
+
+          <div class="d-flex justify-content-center" v-if="aiResponse && aiResponse.startsWith('doğru')">
+            <button type="button" class="btn btn-primary mt-3" @click="submitForm">Malzemeyi Kaydet</button>
+          </div>
+        </form>
+        <div v-if="suggestions.length > 0" class="suggestions">
+          <div v-for="suggestion in suggestions" :key="suggestion.PART_NO" class="suggestion-item" @click="openEditModal(suggestion)">
+            {{ suggestion.DESCRIPTION }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Düzenleme Modali -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Malzeme Düzenleme</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="submitEditForm">
+              <div class="form-group">
+                <label for="editMaterialName">Malzeme Adı</label>
+                <input type="text" id="editMaterialName" v-model="editMaterialName" class="form-control">
+              </div>
+              <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary mt-3">Değişiklikleri Kaydet</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+const { createApp, ref, computed } = Vue;
+
+function normalizeString(str) {
+    if (!str) return '';
+    const letters = { 'i': 'İ', 'ş': 'Ş', 'ğ': 'Ğ', 'ü': 'Ü', 'ö': 'Ö', 'ç': 'Ç', 'ı': 'I' };
+    str = str.replace(/(([iışğüçö]))/g, letter => letters[letter]);
+    return str.toUpperCase().trim();
+}
+
+createApp({
+    setup() {
+        const form = ref({
+            category: '',
+            material: '',
+            type: '',
+            standard: '',
+            nominalDiameter: '',
+            inchSize: '',
+            schedule: '',
+            outerDiameter: '',
+            wallThickness: '',
+            materialQuality: '',
+            additionalInfo: '',
+            alloy: '',
+            dimensions: '',
+        });
+
+        const editMaterialName = ref('');
+        const selectedMaterialName = ref('');
+        const aiResponse = ref('');
+        const suggestions = ref([]);
+        const loading = ref(false);
+
+        const tamMalzemeIsmi = computed(() => {
+            const formValues = [
+                form.value.category,
+                form.value.type,
+                form.value.material,
+                form.value.standard,
+                form.value.nominalDiameter,
+                form.value.inchSize,
+                form.value.schedule,
+                form.value.outerDiameter,
+                form.value.wallThickness,
+                form.value.materialQuality,
+                form.value.additionalInfo,
+                form.value.alloy,
+                form.value.dimensions,
+            ];
+
+            return formValues.filter(Boolean).map(normalizeString).join(' ').trim();
+        });
+
+        const updateSuggestions = () => {
+            const query = {
+                category: normalizeString(form.value.category),
+                type: normalizeString(form.value.type),
+                material: normalizeString(form.value.material),
+                standard: normalizeString(form.value.standard),
+                nominalDiameter: normalizeString(form.value.nominalDiameter),
+                inchSize: normalizeString(form.value.inchSize),
+                schedule: normalizeString(form.value.schedule),
+                outerDiameter: normalizeString(form.value.outerDiameter),
+                wallThickness: normalizeString(form.value.wallThickness),
+                materialQuality: normalizeString(form.value.materialQuality),
+                additionalInfo: normalizeString(form.value.additionalInfo),
+                alloy: normalizeString(form.value.alloy),
+                dimensions: normalizeString(form.value.dimensions),
+            };
+
+            axios.get('http://localhost:3000/suggest', { params: query })
+                .then(response => {
+                    suggestions.value = response.data;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        };
+
+        const openEditModal = (suggestion) => {
+            editMaterialName.value = suggestion.DESCRIPTION;
+            Object.assign(form.value, suggestion); // Formu seçilen öneriyle güncelle
+            $('#editModal').modal('show');
+        };
+
+        const submitEditForm = () => {
+            selectedMaterialName.value = editMaterialName.value;
+            $('#editModal').modal('hide');
+        };
+
+        const checkMM = (value, field) => {
+            if (value && !value.toLowerCase().includes('mm')) {
+                alert(`${field} kısmında mm birimini belirtmelisiniz.`);
+            }
+        };
+
+        const isFormIncomplete = computed(() => {
+            return !form.value.category;
+        });
+
+        const submitForm = () => {
+            const materialNameToSubmit = selectedMaterialName.value || tamMalzemeIsmi.value;
+
+            const payload = {
+                ...form.value,
+                materialName: materialNameToSubmit,
+            };
+
+            axios.post('http://localhost:3000/submit', payload)
+                .then(response => {
+                    alert('Form başarıyla gönderildi');
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    if (error.response && error.response.status === 409) {
+                        alert(error.response.data.message); // Bu malzeme zaten malzeme listesinde var.
+                    } else {
+                        alert('Form gönderilirken bir hata oluştu');
+                    }
+                    console.error(error);
+                });
+        };
+
+        const analyzeMaterial = async () => {
+            loading.value = true;
+            const materialName = selectedMaterialName.value || tamMalzemeIsmi.value;
+
+            const postData = {
+                prompt: materialName
+            };
+
+            try {
+                const response = await axios.post('http://localhost:3000/ask-ai', postData);
+                aiResponse.value = response.data;
+            } catch (error) {
+                console.error('Error sending message:', error);
+                aiResponse.value = 'Yapay Zeka ile iletişim kurarken bir hata oluştu.';
+            } finally {
+                loading.value = false;
+            }
+        };
+
+        return {
+            form,
+            editMaterialName,
+            selectedMaterialName,
+            suggestions,
+            updateSuggestions,
+            openEditModal,
+            isFormIncomplete,
+            submitForm,
+            submitEditForm,
+            tamMalzemeIsmi,
+            checkMM,
+            analyzeMaterial,
+            aiResponse,
+            loading
+        };
+    }
+}).mount('#app');
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
