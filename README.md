@@ -1,6 +1,3 @@
-### README.md Dosyası İçeriği
-
-```markdown
 # AI-Powered Material Entry Validator for Shipyards
 
 ![AI-Powered Material Entry Validator](https://firebasestorage.googleapis.com/v0/b/chat-api-aa04a.appspot.com/o/Screenshots%2FScreenshot%20from%202024-07-22%2009-38-49.png?alt=media&token=169a086d-81b4-4f1a-8e60-1cd81bf82d97)
@@ -24,8 +21,7 @@ The AI-Powered Material Entry Validator ensures the correct entry and storage of
     ```
 
 2. **Navigate to the project directory:**
-gs://chat-api-aa04a.appspot.com/Screenshots/Screenshot from 2024-07-22 09-38-49.png
-https://firebasestorage.googleapis.com/v0/b/chat-api-aa04a.appspot.com/o/Screenshots%2FScreenshot%20from%202024-07-22%2009-38-49.png?alt=media&token=169a086d-81b4-4f1a-8e60-1cd81bf82d97
+
     ```bash
     cd material-save
     ```
@@ -60,25 +56,3 @@ Contributions are welcome! Please open an issue or submit a pull request.
 ## License
 
 This project is licensed under the MIT License.
-```
-
-### Proje Dosya Yapısı
-
-```
-material-save/
-├── backend/
-│   ├── Dockerfile
-│   ├── server.js
-│   ├── malzemeler.json
-│   ├── package.json
-│   └── .env
-├── frontend/
-│   ├── Dockerfile
-│   └── index.html
-├── docker-compose.yml
-├── README.md
-└── docs/
-    └── screenshot.png
-```
-
-Bu yapı, projenizin dosya yapısını ve gerekli kurulum adımlarını içeren net bir rehber sunar. Ayrıca, README dosyasına bir ekran görüntüsü ekleyerek projenizin nasıl göründüğünü görsel olarak da gösterebilirsiniz. `docs/screenshot.png` yolunda bir ekran görüntüsü dosyası ekleyerek README'deki resim bağlantısının çalışmasını sağlayabilirsiniz.
